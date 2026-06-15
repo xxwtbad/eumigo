@@ -84,7 +84,17 @@ const columns: TableColumnList = [
 async function onSearch() {
   loading.value = true;
   try {
-    dataList.value = await getAllSiteConfig();
+    const res = await getAllSiteConfig();
+    console.log("[site-config] API 返回:", res);
+    if (Array.isArray(res)) {
+      dataList.value = res;
+    } else {
+      msg("站点配置数据格式异常，请刷新重试", { type: "warning" });
+      console.error("[site-config] 返回不是数组:", res);
+    }
+  } catch (e: any) {
+    msg(e?.message ?? "获取站点配置失败", { type: "error" });
+    console.error("[site-config] 请求失败:", e);
   } finally {
     loading.value = false;
   }
