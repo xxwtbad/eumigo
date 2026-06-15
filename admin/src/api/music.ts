@@ -23,7 +23,7 @@ export const getLocalMusics = () => {
 export const uploadMusic = (data: FormData) => {
   return http.request<{ success: boolean; music: MusicItem }>("post", "/api/music/upload", {
     data,
-    headers: { "Content-Type": "multipart/form-data" }
+    timeout: 120000
   });
 };
 
@@ -31,7 +31,7 @@ export const uploadMusic = (data: FormData) => {
 export const updateMusic = (id: number, data: FormData) => {
   return http.request<{ success: boolean; music: MusicItem }>("put", `/api/music/${id}`, {
     data,
-    headers: { "Content-Type": "multipart/form-data" }
+    timeout: 120000
   });
 };
 

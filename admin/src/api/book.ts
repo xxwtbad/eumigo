@@ -95,7 +95,7 @@ export const uploadBook = (formData: FormData) => {
     "/api/upload/book",
     {
       data: formData,
-      headers: { "Content-Type": "multipart/form-data" }
+      timeout: 180000
     }
   );
 };

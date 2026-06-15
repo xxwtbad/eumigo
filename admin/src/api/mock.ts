@@ -16,11 +16,6 @@ export const formUpload = data => {
   return http.request<Result>(
     "post",
     "https://pureadmin.free.beeceptor.com/images",
-    { data },
-    {
-      headers: {
-        "Content-Type": "multipart/form-data"
-      }
-    }
+    { data, timeout: 60000 }
   );
 };

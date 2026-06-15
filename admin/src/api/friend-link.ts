@@ -59,7 +59,7 @@ export const uploadImage = (file: File) => {
     "/api/upload/image",
     {
       data: formData,
-      headers: { "Content-Type": "multipart/form-data" }
+      timeout: 60000
     }
   );
 };
