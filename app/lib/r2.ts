@@ -87,6 +87,10 @@ export async function getFile(key: string): Promise<Buffer | null> {
 }
 
 export function getFileUrl(key: string): string {
+  const publicUrl = process.env.R2_PUBLIC_URL;
+  if (publicUrl) {
+    return `${publicUrl.replace(/\/$/, "")}/${key}`;
+  }
   const accountId = process.env.R2_ACCOUNT_ID;
   const bucket = getBucketName();
   if (accountId) {
