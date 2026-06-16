@@ -1,1 +1,0 @@
-import{A as e}from"./index-BCb1IcWv.js";var t=t=>e.request(`post`,`/api/upload/presigned`,{data:t});export{t};

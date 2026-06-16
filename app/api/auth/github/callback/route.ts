@@ -31,7 +31,7 @@ export async function GET(request: Request) {
     }
 
     // 1) 获取 access_token
-    const redirectUri = `${process.env.FRONTEND_ORIGIN || "https://ddmer.ccwu.cc"}/api/auth/github/callback`;
+    const redirectUri = `${process.env.FRONTEND_ORIGIN || "https://ddmer.ccw.cc"}/api/auth/github/callback`;
     const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
       method: "POST",
       headers: {

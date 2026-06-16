@@ -43,3 +43,6 @@ next-env.d.ts
 
 # blog posts (content is managed separately)
 /content/posts/
+
+# admin build output (rebuilt on deploy)
+/public/admin

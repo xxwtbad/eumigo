@@ -1,1 +1,0 @@
-import{A as e}from"./index-BILzCam2.js";var t=t=>e.request(`post`,`/api/upload/presigned`,{data:t});export{t};

@@ -1,1 +1,0 @@
-import{A as e}from"./index-BzVrEs2b.js";var t=()=>e.request(`get`,`/api/categories`),n=t=>e.request(`post`,`/api/categories`,{data:t}),r=(t,n)=>e.request(`put`,`/api/categories/${t}`,{data:n}),i=t=>e.request(`delete`,`/api/categories/${t}`);export{r as i,i as n,t as r,n as t};
