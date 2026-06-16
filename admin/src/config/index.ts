@@ -1,5 +1,6 @@
 import axios from "axios";
 import type { App } from "vue";
+import platformConfig from "/public/platform-config.json";
 
 let config: object = {};
 const { VITE_PUBLIC_PATH } = import.meta.env;
@@ -31,7 +32,7 @@ export const getPlatformConfig = async (app: App): Promise<undefined> => {
   app.config.globalProperties.$config = getConfig();
   return axios({
     method: "get",
-    url: `${VITE_PUBLIC_PATH}platform-config.json`
+    url: `${VITE_PUBLIC_PATH || "/admin/"}platform-config.json`
   })
     .then(({ data: config }) => {
       let $config = app.config.globalProperties.$config;
@@ -44,8 +45,13 @@ export const getPlatformConfig = async (app: App): Promise<undefined> => {
       }
       return $config;
     })
-    .catch(() => {
-      throw "请在public文件夹下添加platform-config.json配置文件";
+    .catch(error => {
+      // 网络失败时直接使用 import 的本地配置
+      console.warn("加载 platform-config.json 失败，使用本地配置:", error?.message);
+      const $config = Object.assign({}, platformConfig);
+      app.config.globalProperties.$config = $config;
+      setConfig($config);
+      return $config;
     });
 };
 

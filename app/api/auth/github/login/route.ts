@@ -10,7 +10,7 @@ export async function GET(request: Request) {
       { status: 500 }
     );
   }
-  const redirectUri = `${process.env.FRONTEND_ORIGIN || "https://ddmer.ccw.cc"}/api/auth/github/callback`;
+  const redirectUri = `${process.env.FRONTEND_ORIGIN || "https://ddmer.ccwu.cc"}/api/auth/github/callback`;
   const url = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=read:user&state=${encodeURIComponent(state)}`;
   return NextResponse.redirect(url);
 }
