@@ -91,6 +91,9 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const playModeRef = useRef(playMode);
   const nextSongRef = useRef<() => void>(() => {});
   const fetchIdRef = useRef(0);
+  // 用 ref 保存当前 playlist，避免 fetchMusicData 依赖它导致引用变化引发无限重取
+  const playlistRef = useRef<Song[]>([]);
+  useEffect(() => { playlistRef.current = playlist; }, [playlist]);
   const pathname = usePathname();
 
   // Fetch saying once on mount
@@ -107,6 +110,13 @@ export function MusicProvider({ children }: { children: ReactNode }) {
   const fetchMusicData = useCallback(async (opts?: { silent?: boolean }) => {
     const myId = ++fetchIdRef.current;
     if (!opts?.silent) setIsLoading(true);
+    // 首屏非静默拉取 8 秒还没回来，强制解除 loading，避免 Meting/外网挂掉时永远卡住
+    let safetyTimer: ReturnType<typeof setTimeout> | null = null;
+    if (!opts?.silent) {
+      safetyTimer = setTimeout(() => {
+        if (myId === fetchIdRef.current) setIsLoading(false);
+      }, 8000);
+    }
     try {
       // 优先从 API 获取动态配置，回退到静态 siteConfig
       let playlistId = siteConfig.cloudMusicPlaylistId;
@@ -161,7 +171,7 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         setPlaylist(songs);
         // 当前播放的歌如果还在新列表里，保留索引；否则重置到第一首
         setCurrentIndex((prev) => {
-          const stillExists = songs.findIndex((s) => s.id === playlist[prev]?.id);
+          const stillExists = songs.findIndex((s) => s.id === playlistRef.current[prev]?.id);
           return stillExists >= 0 ? stillExists : 0;
         });
       } else {
@@ -171,9 +181,10 @@ export function MusicProvider({ children }: { children: ReactNode }) {
     } catch {
       // 静默失败：保持原列表不变
     } finally {
+      if (safetyTimer) clearTimeout(safetyTimer);
       if (myId === fetchIdRef.current) setIsLoading(false);
     }
-  }, [playlist]);
+  }, []);
 
   // 初次加载
   useEffect(() => {
