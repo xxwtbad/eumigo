@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     // 统一返回模糊错误，不泄露用户是否存在
     if (!user) {
       recordLoginFailure(username);
-      await recordLoginLog({ request, userId: 0, username, summary: "登录失败：用户名或密码错误" });
+      try { await recordLoginLog({ request, userId: 0, username, summary: "登录失败：用户名或密码错误" }); } catch {}
       return NextResponse.json(
         { code: 1, message: "用户名或密码错误" },
         { status: 400 }
@@ -46,13 +46,13 @@ export async function POST(request: Request) {
     if (!pwdMatch) {
       const result = recordLoginFailure(username);
       if (result.locked) {
-        await recordLoginLog({ request, userId: user.id, username, summary: "登录失败：失败次数过多，账户已锁定" });
+        try { await recordLoginLog({ request, userId: user.id, username, summary: "登录失败：失败次数过多，账户已锁定" }); } catch {}
         return NextResponse.json(
           { code: 1, message: "登录失败次数过多，请 5 分钟后再试" },
           { status: 429 }
         );
       }
-      await recordLoginLog({ request, userId: user.id, username, summary: "登录失败：用户名或密码错误" });
+      try { await recordLoginLog({ request, userId: user.id, username, summary: "登录失败：用户名或密码错误" }); } catch {}
       return NextResponse.json(
         { code: 1, message: "用户名或密码错误" },
         { status: 400 }
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
 
     // 登录成功，清除失败记录
     clearLoginAttempts(username);
-    await recordLoginLog({ request, userId: user.id, username, summary: "登录成功" });
+    try { await recordLoginLog({ request, userId: user.id, username, summary: "登录成功" }); } catch {}
 
     const accessToken = await createToken({
       sub: String(user.id),

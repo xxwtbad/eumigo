@@ -30,8 +30,9 @@ export async function GET(request: Request) {
       );
     }
 
-    // 1) 获取 access_token
-    const redirectUri = `${process.env.FRONTEND_ORIGIN || "https://ddmer.ccwu.cc"}/api/auth/github/callback`;
+    // 1) 获取 access_token（从请求 URL 动态获取回调地址，兼容不同域名的部署）
+    const requestUrl = new URL(request.url);
+    const redirectUri = `${requestUrl.origin}/api/auth/github/callback`;
     const tokenRes = await fetch("https://github.com/login/oauth/access_token", {
       method: "POST",
       headers: {
