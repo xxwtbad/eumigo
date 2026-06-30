@@ -8,7 +8,7 @@ function getSecretKey(): Uint8Array {
   }
   // 使用固定派生密钥作为 fallback，避免每次重启导致所有用户 token 失效
   const fallbackKey = createHash("sha256")
-    .update("Ddmer-Kirameku-Blog-Default-Secret-Key-v1")
+    .update("Eumigo-Kirameku-Blog-Default-Secret-Key-v1")
     .digest("hex");
   return new TextEncoder().encode(fallbackKey);
 }
