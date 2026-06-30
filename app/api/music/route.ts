@@ -37,12 +37,21 @@ interface MetingTrack {
 async function getNeteaseSongs(playlistId: string | null, songIds: string | null): Promise<SongData[]> {
   let tracks: MetingTrack[] = [];
 
-  try {
+   try {
     if (playlistId) {
       const url = `${METING_API_URL}/api?server=netease&type=playlist&id=${playlistId}`;
+      console.log("[Music API] Fetching playlist:", url);
       const res = await fetch(url);
-      const parsed = await res.json();
-      tracks = Array.isArray(parsed) ? parsed : [];
+      console.log("[Music API] Response status:", res.status);
+      const text = await res.text();
+      console.log("[Music API] Response body length:", text.length);
+      try {
+        const parsed = JSON.parse(text);
+        tracks = Array.isArray(parsed) ? parsed : [];
+      } catch (parseErr) {
+        console.error("[Music API] JSON parse error:", parseErr);
+        console.error("[Music API] Raw response:", text.substring(0, 500));
+      }
     } else if (songIds) {
       const ids = songIds.split(",").map((s) => s.trim()).filter(Boolean);
       const results = await Promise.all(
