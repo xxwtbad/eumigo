@@ -7,7 +7,8 @@ export const revalidate = 0;
 export const runtime = "nodejs";
 
 // 使用代理服务器避免服务器IP被网易云封禁
-const METING_API_URL = process.env.METING_API_URL || "https://api.i-meto.com/meting";
+// api.i-meto.com 有 Cloudflare 保护会拦截 Vercel 请求，使用其他 API
+const METING_API_URL = process.env.METING_API_URL || "https://meting-api.vercel.app";
 
 interface SongData {
   id: string;
