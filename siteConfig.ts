@@ -38,7 +38,7 @@ export const siteConfig = {
   },
 
   // 站点信息
-  buildDate: "2026-06-26T00:00:00",
+  buildDate: "2026-06-29T00:00:00",
   icpConfig: {
     name: "",
     link: "",
