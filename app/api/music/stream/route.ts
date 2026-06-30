@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
-
-const METING_API_URL = process.env.METING_API_URL || "https://api.i-meto.com/meting";
+import Meting from "@meting/core";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -10,10 +9,12 @@ export async function GET(req: NextRequest) {
     return new Response("缺少 url_id 参数", { status: 400 });
   }
 
+  const meting = new Meting("netease");
+  meting.format(true);
+
   try {
-    const url = `${METING_API_URL}/api?server=netease&type=url&id=${urlId}&br=320`;
-    const res = await fetch(url);
-    const data = await res.json();
+    const raw = await meting.url(urlId, 320);
+    const data = JSON.parse(raw as string);
     const src = (data.url || "").replace(/^http:\/\//, "https://");
 
     if (!src) {
