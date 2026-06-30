@@ -7,10 +7,10 @@ export async function GET(request: NextRequest) {
     await getCurrentUser(request);
 
     const siteConfigs = [
-      { key: "title", value: "My Blog", description: "网站标题" },
+      { key: "title", value: "玉米狗的小站", description: "网站标题" },
       { key: "url", value: "https://example.com/", description: "网站地址" },
-      { key: "authorName", value: "Admin", description: "作者名" },
-      { key: "bio", value: "欢迎来到我的博客", description: "个人简介" },
+      { key: "authorName", value: "玉米狗", description: "作者名" },
+      { key: "bio", value: "日常点滴，随手记录", description: "个人简介" },
       { key: "avatarUrl", value: "", description: "头像图片地址（空则使用默认）" },
       { key: "useGradient", value: "false", description: "是否使用渐变背景" },
       { key: "themeColors", value: JSON.stringify(["#a18cd1", "#fbc2eb", "#a1c4fd", "#c2e9fb"]), description: "主题颜色数组" },
