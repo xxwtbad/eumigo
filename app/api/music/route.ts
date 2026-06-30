@@ -25,8 +25,17 @@ interface SongData {
   dbId?: number;
 }
 
+interface MetingTrack {
+  id: string;
+  title: string;
+  author: string;
+  url: string;
+  pic: string;
+  lrc: string;
+}
+
 async function getNeteaseSongs(playlistId: string | null, songIds: string | null): Promise<SongData[]> {
-  let tracks: { id: string; name: string; artist: string[]; pic_id: string; url_id: string; lyric_id: string }[] = [];
+  let tracks: MetingTrack[] = [];
 
   try {
     if (playlistId) {
@@ -55,43 +64,31 @@ async function getNeteaseSongs(playlistId: string | null, songIds: string | null
     tracks = [];
   }
 
-  const songs: SongData[] = await Promise.all(
-    tracks.map(async (track) => {
-      let src = "";
-      try {
-        const url = `${METING_API_URL}/api?server=netease&type=url&id=${track.url_id}&br=320`;
-        const res = await fetch(url);
-        const urlData = await res.json();
-        src = (urlData.url || "").replace(/^http:\/\//, "https://");
-      } catch {
-        // ignore
-      }
+  const songs: SongData[] = tracks
+    .filter((track) => track.url)
+    .map((track) => {
+      // 从url中提取id用于流代理
+      const urlMatch = track.url.match(/[?&]id=([^&]+)/);
+      const urlId = urlMatch ? urlMatch[1] : String(track.id);
 
-      let cover = "";
-      try {
-        const url = `${METING_API_URL}/api?server=netease&type=pic&id=${track.pic_id}&size=300`;
-        const res = await fetch(url);
-        const picData = await res.json();
-        cover = (picData.url || "").replace(/^http:\/\//, "https://");
-      } catch {
-        // ignore
-      }
+      // 从lrc中提取id用于歌词代理
+      const lrcMatch = track.lrc?.match(/[?&]id=([^&]+)/);
+      const lyricId = lrcMatch ? lrcMatch[1] : String(track.id);
 
       return {
         id: String(track.id),
-        title: track.name || "未知歌曲",
-        artist: Array.isArray(track.artist) ? track.artist.join(", ") : String(track.artist || "未知歌手"),
-        cover,
-        src: src ? `/api/music/stream?url_id=${track.url_id}` : "",
-        lrcUrl: track.lyric_id ? `/api/music/lyrics?lyric_id=${track.lyric_id}` : "",
+        title: track.title || "未知歌曲",
+        artist: track.author || "未知歌手",
+        cover: track.pic ? track.pic.replace(/^http:\/\//, "https://") : "",
+        src: track.url.replace(/^http:\/\//, "https://"),
+        lrcUrl: track.lrc ? track.lrc.replace(/^http:\/\//, "https://") : "",
         type: "netease" as const,
-        url_id: String(track.url_id),
-        lyric_id: track.lyric_id ? String(track.lyric_id) : "",
+        url_id: urlId,
+        lyric_id: lyricId,
       };
-    })
-  );
+    });
 
-  return songs.filter((s) => s.src);
+  return songs;
 }
 
 async function getLocalSongs(): Promise<SongData[]> {
@@ -124,6 +121,7 @@ export async function GET(req: NextRequest) {
     const source = searchParams.get("source");
     const playlistId = searchParams.get("id");
     const songIds = searchParams.get("ids");
+
     // 只获取本地音乐
     if (source === "local") {
       const songs = await getLocalSongs();
