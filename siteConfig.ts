@@ -2,10 +2,10 @@
 
 export const siteConfig = {
   // 网站标题与博主信息
-  title: "My Blog",
+  title: "玉米狗的小站",
   url: "https://example.com/",
-  authorName: "Admin",
-  bio: "欢迎来到我的博客",
+  authorName: "玉米狗",
+  bio: "欢迎来到我的小站",
 
   // 头像设置
   avatarUrl: "",
