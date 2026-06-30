@@ -31,6 +31,10 @@ export async function GET(request: NextRequest) {
       { key: "moeIcp_link", value: "", description: "萌ICP备案链接" },
       { key: "chatterTitle", value: "留言", description: "说说/留言页面标题" },
       { key: "chatterDescription", value: "生活、技术、随想的碎片记录", description: "说说/留言页面描述" },
+        // Live2D 看板娘开关
+      // 控制是否显示页面左下角的 Live2D 看板娘动画
+      // 值为 "true" 显示，"false" 隐藏
+      { key: "live2d_enabled", value: "true", description: "是否开启 Live2D 看板娘（true=开启，false=关闭）" },
     ];
 
     let created = 0;
