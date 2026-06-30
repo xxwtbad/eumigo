@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 
 // 使用代理服务器避免服务器IP被网易云封禁
-const METING_API_URL = process.env.METING_API_URL || "https://api.i-meto.com/meting";
+const METING_API_URL = process.env.METING_API_URL || "https://meting-api.vercel.app";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
