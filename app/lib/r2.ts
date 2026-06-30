@@ -26,7 +26,7 @@ function getS3Client(): S3Client {
 }
 
 function getBucketName(): string {
-  return process.env.R2_BUCKET_NAME || "kirameku-files";
+  return process.env.R2_BUCKET_NAME || "eumigo-files";
 }
 
 /**
