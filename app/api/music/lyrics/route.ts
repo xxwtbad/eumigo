@@ -1,6 +1,5 @@
 import { NextRequest } from "next/server";
-
-const METING_API_URL = process.env.METING_API_URL || "https://api.i-meto.com/meting";
+import Meting from "@meting/core";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -10,12 +9,13 @@ export async function GET(req: NextRequest) {
     return new Response("缺少 lyric_id 参数", { status: 400 });
   }
 
-  try {
-    const url = `${METING_API_URL}/api?server=netease&type=lyric&id=${lyricId}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    const lrc = data.lyric || data.lrc || "";
+  const meting = new Meting("netease");
+  meting.format(true);
 
+  try {
+    const raw = await meting.lyric(lyricId);
+    const data = JSON.parse(raw as string);
+    const lrc = data.lyric || data.lrc || "";
 
     if (!lrc) {
       return new Response("暂无歌词", { status: 200 });
