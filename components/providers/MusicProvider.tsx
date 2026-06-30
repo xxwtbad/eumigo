@@ -125,12 +125,12 @@ export function MusicProvider({ children }: { children: ReactNode }) {
         const configRes = await fetch("/api/site-config", { cache: "no-store" });
         if (configRes.ok) {
           const config = await configRes.json();
-          if (config.cloud_music_playlist_id) {
-            playlistId = config.cloud_music_playlist_id;
+          if (config.cloudMusicPlaylistId) {
+            playlistId = config.cloudMusicPlaylistId;
           }
-          if (config.cloud_music_ids) {
+          if (config.cloudMusicIds) {
             try {
-              const parsed = JSON.parse(config.cloud_music_ids);
+              const parsed = JSON.parse(config.cloudMusicIds);
               if (Array.isArray(parsed) && parsed.length > 0) musicIds = parsed;
             } catch { /* ignore */ }
           }
