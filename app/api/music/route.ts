@@ -7,8 +7,6 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const runtime = "nodejs";
 
-const METING_API_URL = process.env.METING_API_URL || "https://api.i-meto.com/meting";
-
 interface SongData {
   id: string;
   title: string;
@@ -26,42 +24,37 @@ interface SongData {
 }
 
 async function getNeteaseSongs(playlistId: string | null, songIds: string | null): Promise<SongData[]> {
+  const meting = new Meting("netease");
+  meting.format(true);
+
   let tracks: { id: string; name: string; artist: string[]; pic_id: string; url_id: string; lyric_id: string }[] = [];
 
-  try {
-    if (playlistId) {
-      const url = `${METING_API_URL}/api?server=netease&type=playlist&id=${playlistId}`;
-      const res = await fetch(url);
-      const parsed = await res.json();
-      tracks = Array.isArray(parsed) ? parsed : [];
-    } else if (songIds) {
-      const ids = songIds.split(",").map((s) => s.trim()).filter(Boolean);
-      const results = await Promise.all(
-        ids.map(async (id) => {
-          try {
-            const url = `${METING_API_URL}/api?server=netease&type=song&id=${id}`;
-            const res = await fetch(url);
-            const parsed = await res.json();
-            return Array.isArray(parsed) ? parsed : [parsed];
-          } catch {
-            return [];
-          }
-        })
-      );
-      tracks = results.flat();
-    }
-  } catch (e) {
-    console.error("[Music API] Error fetching tracks:", e);
-    tracks = [];
+  if (playlistId) {
+    const raw = await meting.playlist(playlistId);
+    const parsed = JSON.parse(raw as string);
+    tracks = Array.isArray(parsed) ? parsed : [];
+  } else if (songIds) {
+    const ids = songIds.split(",").map((s) => s.trim()).filter(Boolean);
+    const results = await Promise.all(
+      ids.map(async (id) => {
+        try {
+          const raw = await meting.song(id);
+          const parsed = JSON.parse(raw as string);
+          return Array.isArray(parsed) ? parsed : [parsed];
+        } catch {
+          return [];
+        }
+      })
+    );
+    tracks = results.flat();
   }
 
   const songs: SongData[] = await Promise.all(
     tracks.map(async (track) => {
       let src = "";
       try {
-        const url = `${METING_API_URL}/api?server=netease&type=url&id=${track.url_id}&br=320`;
-        const res = await fetch(url);
-        const urlData = await res.json();
+        const urlRaw = await meting.url(track.url_id, 320);
+        const urlData = JSON.parse(urlRaw as string);
         src = (urlData.url || "").replace(/^http:\/\//, "https://");
       } catch {
         // ignore
@@ -69,9 +62,8 @@ async function getNeteaseSongs(playlistId: string | null, songIds: string | null
 
       let cover = "";
       try {
-        const url = `${METING_API_URL}/api?server=netease&type=pic&id=${track.pic_id}&size=300`;
-        const res = await fetch(url);
-        const picData = await res.json();
+        const picRaw = await meting.pic(track.pic_id, 300);
+        const picData = JSON.parse(picRaw as string);
         cover = (picData.url || "").replace(/^http:\/\//, "https://");
       } catch {
         // ignore
