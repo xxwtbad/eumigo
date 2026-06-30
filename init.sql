@@ -409,10 +409,10 @@ ON CONFLICT ("username") DO NOTHING;
 -- SeedData: 默认站点配置（首次搭建可直接使用）
 INSERT INTO "SiteConfig" ("key", "value", "description", "updated_at")
 VALUES
-  ('title', 'My Blog', '网站标题', CURRENT_TIMESTAMP),
+  ('title', '玉米狗的小站', '网站标题', CURRENT_TIMESTAMP),
   ('url', 'https://example.com/', '网站地址', CURRENT_TIMESTAMP),
-  ('authorName', 'Admin', '作者名', CURRENT_TIMESTAMP),
-  ('bio', '欢迎来到我的博客', '个人简介', CURRENT_TIMESTAMP),
+  ('authorName', '玉米狗', '作者名', CURRENT_TIMESTAMP),
+  ('bio', '随手记录，个人点滴', '个人简介', CURRENT_TIMESTAMP),
   ('avatarUrl', '', '头像图片地址（空则使用默认）', CURRENT_TIMESTAMP),
   ('useGradient', 'false', '是否使用渐变背景', CURRENT_TIMESTAMP),
   ('themeColors', '["#a18cd1","#fbc2eb","#a1c4fd","#c2e9fb"]', '主题颜色数组', CURRENT_TIMESTAMP),
