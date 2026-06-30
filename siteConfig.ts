@@ -22,7 +22,7 @@ export const siteConfig = {
   photoWallImage: "",
 
   // 云音乐配置（网易云音乐）
-  cloudMusicPlaylistId: "",
+  cloudMusicPlaylistId: "18105933163",
   cloudMusicIds: [],
 
   // 后端 API 地址
