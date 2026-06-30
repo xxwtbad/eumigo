@@ -3,7 +3,7 @@
 export const siteConfig = {
   // 网站标题与博主信息
   title: "玉米狗的小站",
-  url: "https://example.com/",
+  url: "https://yumigou.bond/",
   authorName: "玉米狗",
   bio: "欢迎来到我的小站",
 
@@ -51,4 +51,13 @@ export const siteConfig = {
   // 分类标题
   chatterTitle: "留言",
   chatterDescription: "生活、技术、随想的碎片记录",
+  
+  // ==========================================
+  // 功能开关配置
+  // ==========================================
+
+  // Live2D 看板娘开关
+  // "true" = 显示看板娘，"false" = 隐藏看板娘
+  // 这是前端兜底配置，优先使用数据库中的站点配置
+  live2dEnabled: "true",
 };
