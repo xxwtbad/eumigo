@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
-import Meting from "@meting/core";
+
+// 使用代理服务器避免服务器IP被网易云封禁
+const METING_API_URL = process.env.METING_API_URL || "https://meting-api.vercel.app";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
@@ -9,12 +11,10 @@ export async function GET(req: NextRequest) {
     return new Response("缺少 url_id 参数", { status: 400 });
   }
 
-  const meting = new Meting("netease");
-  meting.format(true);
-
   try {
-    const raw = await meting.url(urlId, 320);
-    const data = JSON.parse(raw as string);
+    const url = `${METING_API_URL}/api?server=netease&type=url&id=${urlId}&br=320`;
+    const res = await fetch(url);
+    const data = await res.json();
     const src = (data.url || "").replace(/^http:\/\//, "https://");
 
     if (!src) {
