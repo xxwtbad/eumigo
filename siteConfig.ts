@@ -8,7 +8,7 @@ export const siteConfig = {
   bio: "欢迎来到我的小站",
 
   // 头像设置
-  avatarUrl: "",
+  avatarUrl: "/images/IMG_0.png",
 
   // 背景设置
   useGradient: false,
