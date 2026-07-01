@@ -79,6 +79,10 @@ export default function CloudPlayer() {
     );
   }
 
+  // ========== 新增：判断当前歌曲是否存在歌词 ==========
+  // 有 lrcUrl 就说明这首歌有歌词文件，间隙时不显示「暂无歌词」
+  const hasLyric = !!currentSong.lrcUrl;
+
   const safeTogglePlay = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -145,7 +149,8 @@ export default function CloudPlayer() {
         {/* Lyric */}
         <div className="relative z-10 mb-2 h-6 overflow-hidden">
           <p className="text-xs font-bold text-indigo-600 dark:text-indigo-400 truncate">
-            {displayedLyric || "暂无歌词"}
+            {/* ========== 修改：修复歌词闪烁问题 ========== */}
+            {hasLyric ? (displayedLyric || "") : "暂无歌词"}
             {isPlaying && <span className="inline-block w-[3px] h-4 bg-indigo-400 align-middle ml-1 animate-pulse" />}
           </p>
         </div>
