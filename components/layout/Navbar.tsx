@@ -150,7 +150,13 @@ export default function Navbar() {
         }
       }
       animate();
-
+   // HTML 特殊字符转义函数
+  const escapeHtml = (str) => {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+};;
+};
       // 彩蛋提示文字，等彩纸下完后出现
       setTimeout(() => {
         const msg = document.createElement("div");
