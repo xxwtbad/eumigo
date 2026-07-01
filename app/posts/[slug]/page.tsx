@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
@@ -61,6 +61,8 @@ import PostComments from "@/components/posts/PostComments";
 
 export default function PostDetailPage() {
   const { slug } = useParams<{ slug: string }>();
+  const searchParams = useSearchParams();
+  const highlightKeyword = searchParams.get("highlight") || "";
   const [post, setPost] = useState<PostDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -70,6 +72,7 @@ export default function PostDetailPage() {
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
   const contentRef = useRef<HTMLDivElement>(null);
+  const articleRef = useRef<HTMLDivElement>(null);
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   useEffect(() => {
@@ -100,6 +103,73 @@ export default function PostDetailPage() {
       });
     });
   }, [post]);
+
+  // 高亮搜索关键词并滚动到第一个匹配位置
+  useEffect(() => {
+    if (!post || !highlightKeyword.trim() || !articleRef.current) return;
+
+    const keyword = highlightKeyword.trim();
+    const root = articleRef.current;
+
+    function highlightNode(node: HTMLElement) {
+      const walker = document.createTreeWalker(
+        node,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: (n) => {
+            const parent = n.parentElement;
+            if (parent?.closest("pre, code")) return NodeFilter.FILTER_REJECT;
+            if (parent?.classList.contains("search-highlight")) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          },
+        }
+      );
+
+      const matches: Text[] = [];
+      let textNode: Node | null;
+      while ((textNode = walker.nextNode())) {
+        if (textNode.textContent?.includes(keyword)) {
+          matches.push(textNode as Text);
+        }
+      }
+
+      matches.forEach((textNode) => {
+        const text = textNode.textContent || "";
+        const parts = text.split(keyword);
+        const fragment = document.createDocumentFragment();
+        parts.forEach((part, index) => {
+          fragment.appendChild(document.createTextNode(part));
+          if (index < parts.length - 1) {
+            const mark = document.createElement("span");
+            mark.className = "search-highlight";
+            mark.textContent = keyword;
+            mark.style.backgroundColor = "#facc15";
+            mark.style.color = "#1f2937";
+            mark.style.padding = "0 2px";
+            mark.style.borderRadius = "2px";
+            fragment.appendChild(mark);
+          }
+        });
+        textNode.parentNode?.replaceChild(fragment, textNode);
+      });
+    }
+
+    // 高亮标题、描述、正文
+    const titleEl = root.querySelector("h1");
+    const descEl = root.querySelector(".post-description");
+    const contentEl = root.querySelector(".post-content");
+    if (titleEl) highlightNode(titleEl as HTMLElement);
+    if (descEl) highlightNode(descEl as HTMLElement);
+    if (contentEl) highlightNode(contentEl as HTMLElement);
+
+    // 滚动到第一个匹配位置
+    const firstMark = root.querySelector(".search-highlight");
+    if (firstMark) {
+      requestAnimationFrame(() => {
+        firstMark.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+    }
+  }, [post, highlightKeyword]);
 
   async function handleLike() {
     if (!post) return;
@@ -161,7 +231,7 @@ export default function PostDetailPage() {
     : "";
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
+    <div ref={articleRef} className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
       <ReadingProgress contentRef={contentRef} />
       {/* 返回按钮 */}
       <motion.div
@@ -207,7 +277,7 @@ export default function PostDetailPage() {
 
           {/* 描述 */}
           {post.description && (
-            <p className="text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 mb-4 sm:mb-6 md:mb-6 leading-relaxed">
+            <p className="post-description text-sm sm:text-base md:text-lg text-slate-600 dark:text-slate-300 mb-4 sm:mb-6 md:mb-6 leading-relaxed">
               {post.description}
             </p>
           )}

@@ -1,15 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { BookOpen, Loader2 } from "lucide-react";
+import { BookOpen, Loader2, SearchX } from "lucide-react";
 import PostCard, { type PostOut } from "@/components/posts/PostCard";
+import SearchBar from "@/components/ui/SearchBar";
 import { getCategories, getPosts, type CategoryItem } from "@/app/api";
 
 export default function PostsPage() {
+  const router = useRouter();
   const [categories, setCategories] = useState<CategoryItem[]>([]);
   const [posts, setPosts] = useState<PostOut[]>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [keyword, setKeyword] = useState("");
+  const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -25,39 +30,56 @@ export default function PostsPage() {
       .catch(() => {});
   }, []);
 
-  // 获取文章
+  // 获取文章（支持分类和关键词搜索）
   useEffect(() => {
-    queueMicrotask(() => setLoading(true));
+    const trimmed = keyword.trim();
+    const isSearch = trimmed.length > 0;
+    queueMicrotask(() => {
+      setLoading(true);
+      if (isSearch && page === 1) setSearching(true);
+    });
     getPosts({
       status: "published",
-      page: 1,
+      page,
       size: pageSize,
       ...(activeCategory ? { category: activeCategory } : {}),
+      ...(trimmed ? { keyword: trimmed } : {}),
     })
       .then((data) => {
-        setPosts(data);
+        // 搜索模式下只有一篇匹配时直接跳转到文章详情并高亮
+        if (isSearch && page === 1 && data.length === 1) {
+          router.push(`/posts/${data[0].slug}?highlight=${encodeURIComponent(trimmed)}`);
+          return;
+        }
+        if (page === 1) {
+          setPosts(data);
+        } else {
+          setPosts((prev) => [...prev, ...data]);
+        }
         setHasMore(data.length === pageSize);
       })
-      .catch(() => { setPosts([]); })
-      .finally(() => { setLoading(false); });
-  }, [activeCategory, pageSize]);
+      .catch(() => {
+        if (page === 1) setPosts([]);
+        setHasMore(false);
+      })
+      .finally(() => {
+        setLoading(false);
+        setSearching(false);
+      });
+  }, [activeCategory, keyword, page, pageSize, router]);
+
+  const handleSearch = (k: string) => {
+    setKeyword(k);
+    setPage(1);
+  };
+
+  const handleCategoryChange = (cat: string | null) => {
+    setActiveCategory(cat);
+    setPage(1);
+  };
 
   const handleLoadMore = () => {
-    const next = page + 1;
-    setPage(next);
-    setLoading(true);
-    getPosts({
-      status: "published",
-      page: next,
-      size: pageSize,
-      ...(activeCategory ? { category: activeCategory } : {}),
-    })
-      .then((data) => {
-        setPosts((prev) => [...prev, ...data]);
-        setHasMore(data.length === pageSize);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    setPage((p) => p + 1);
   };
 
   return (
@@ -80,6 +102,42 @@ export default function PostsPage() {
         </p>
       </motion.div>
 
+      {/* 搜索框 */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.12 }}
+        className="mb-5 md:mb-8"
+      >
+        <SearchBar
+          onSearch={handleSearch}
+          placeholder="搜索文章内容..."
+        />
+      </motion.div>
+
+      {/* 搜索状态提示 */}
+      {keyword.trim() && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-4 md:mb-6 text-sm md:text-base text-slate-600 dark:text-slate-400"
+        >
+          {searching ? (
+            <span className="flex items-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              正在搜索「{keyword.trim()}」...
+            </span>
+          ) : posts.length > 0 ? (
+            <span>
+              找到 <span className="font-semibold text-sky-500">{posts.length}</span> 篇包含「{keyword.trim()}」的文章
+              {posts.length >= pageSize && "（更多结果可加载）"}
+            </span>
+          ) : (
+            <span className="text-slate-400">未找到包含「{keyword.trim()}」的文章</span>
+          )}
+        </motion.div>
+      )}
+
       {/* 分类筛选 */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
@@ -91,7 +149,7 @@ export default function PostsPage() {
           label="全部"
           count={null}
           active={activeCategory === null}
-          onClick={() => setActiveCategory(null)}
+          onClick={() => handleCategoryChange(null)}
         />
         {categories.map((cat) => (
           <FilterTab
@@ -99,7 +157,7 @@ export default function PostsPage() {
             label={cat.name}
             count={cat.post_count}
             active={activeCategory === cat.slug}
-            onClick={() => setActiveCategory(cat.slug)}
+            onClick={() => handleCategoryChange(cat.slug)}
           />
         ))}
       </motion.div>
@@ -111,13 +169,22 @@ export default function PostsPage() {
         </div>
       ) : posts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-32 text-slate-400">
-          <BookOpen className="w-12 h-12 mb-4 opacity-40" />
-          <p>暂无文章</p>
+          {keyword ? (
+            <>
+              <SearchX className="w-12 h-12 mb-4 opacity-40" />
+              <p>未找到包含「{keyword}」的文章</p>
+            </>
+          ) : (
+            <>
+              <BookOpen className="w-12 h-12 mb-4 opacity-40" />
+              <p>暂无文章</p>
+            </>
+          )}
         </div>
       ) : (
         <AnimatePresence mode="wait">
           <motion.div
-            key={activeCategory ?? "all"}
+            key={`${activeCategory ?? "all"}-${keyword || "all"}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
