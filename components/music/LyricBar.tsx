@@ -72,7 +72,11 @@ export default function LyricBar() {
         {/* Lyric / Saying */}
         <div className="flex-1 px-3 md:px-8 flex justify-center items-center overflow-hidden">
           <p className="text-white text-sm md:text-lg font-bold tracking-wider md:tracking-widest truncate drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]">
-            {displayedText || (isPlaying ? "♪ ♪" : saying || "暂无歌词，点击换一句")}
+            {
+      hasLyric
+        ? (displayedText || (isPlaying ? "♪ ♪" : ""))
+        : (isPlaying ? "♪ ♪" : saying || "暂无歌词，点击换一句")
+    }
             <span className="inline-block w-[3px] h-5 bg-indigo-400 align-middle ml-1 shadow-[0_0_8px_rgba(99,102,241,0.8)] animate-cursor" />
           </p>
         </div>
