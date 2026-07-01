@@ -410,7 +410,7 @@ ON CONFLICT ("username") DO NOTHING;
 INSERT INTO "SiteConfig" ("key", "value", "description", "updated_at")
 VALUES
   ('title', '玉米狗的小站', '网站标题', CURRENT_TIMESTAMP),
-  ('url', 'https://example.com/', '网站地址', CURRENT_TIMESTAMP),
+  ('url', 'https://yumigou.bond/', '网站地址', CURRENT_TIMESTAMP),
   ('authorName', '玉米狗', '作者名', CURRENT_TIMESTAMP),
   ('bio', '随手记录，个人点滴', '个人简介', CURRENT_TIMESTAMP),
   ('avatarUrl', '', '头像图片地址（空则使用默认）', CURRENT_TIMESTAMP),
@@ -419,7 +419,7 @@ VALUES
   ('bgImages', '[]', '背景图片地址数组（JSON）', CURRENT_TIMESTAMP),
   ('defaultPostCover', '', '文章默认封面图（空则使用默认）', CURRENT_TIMESTAMP),
   ('photoWallImage', '', '照片墙预览图（空则使用默认）', CURRENT_TIMESTAMP),
-  ('cloudMusicPlaylistId', '', '网易云音乐歌单ID', CURRENT_TIMESTAMP),
+  ('cloudMusicPlaylistId', '18105933163', '网易云音乐歌单ID', CURRENT_TIMESTAMP),
   ('cloudMusicIds', '[]', '网易云音乐歌曲ID数组（JSON）', CURRENT_TIMESTAMP),
   ('apiBaseUrl', '', '后端API地址（空则使用当前域名）', CURRENT_TIMESTAMP),
   ('social_github', '', 'GitHub链接', CURRENT_TIMESTAMP),
