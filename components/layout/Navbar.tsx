@@ -157,7 +157,7 @@ export default function Navbar() {
         msg.innerHTML = `
           <div style="font-size:48px;margin-bottom:12px">🎉</div>
           <div style="font-size:24px;font-weight:bold;margin-bottom:8px">恭喜你发现了彩蛋！</div>
-          <div style="font-size:14px;opacity:0.8">连续点击 Logo 7 次触发 ·{authorName}の小站</div>
+          <div style="font-size:14px;opacity:0.8">连续点击 Logo 7 次触发 · ${authorName}の小站</div>
         `;
         msg.style.cssText = `
           position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
