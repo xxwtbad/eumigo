@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
 
     const siteConfigs = [
       { key: "title", value: "玉米狗的小站", description: "网站标题" },
-      { key: "url", value: "https://example.com/", description: "网站地址" },
+      { key: "url", value: "https://yumigou.bond/", description: "网站地址" },
       { key: "authorName", value: "玉米狗", description: "作者名" },
       { key: "bio", value: "日常点滴，随手记录", description: "个人简介" },
       { key: "avatarUrl", value: "", description: "头像图片地址（空则使用默认）" },
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       { key: "bgImages", value: "[]", description: "背景图片地址数组（JSON）" },
       { key: "defaultPostCover", value: "", description: "文章默认封面图（空则使用默认）" },
       { key: "photoWallImage", value: "", description: "照片墙预览图（空则使用默认）" },
-      { key: "cloudMusicPlaylistId", value: "", description: "网易云音乐歌单ID" },
+      { key: "cloudMusicPlaylistId", value: "18105933163", description: "网易云音乐歌单ID" },
       { key: "cloudMusicIds", value: "[]", description: "网易云音乐歌曲ID数组（JSON）" },
       { key: "apiBaseUrl", value: "", description: "后端API地址（空则使用当前域名）" },
       { key: "social_github", value: "", description: "GitHub链接" },
