@@ -77,13 +77,7 @@ export default function LyricBar() {
         <div className="flex-1 px-3 md:px-8 flex justify-center items-center overflow-hidden">
           <p className="text-white text-sm md:text-lg font-bold tracking-wider md:tracking-widest truncate drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]">
             {/* 修复后的显示逻辑 */}
-            {
-              hasLyric
-                // 有歌词：播放间隙只显示音符，绝不出现「暂无歌词」
-                ? (displayedText || (isPlaying ? "♪ ♪" : ""))
-                // 整首歌没歌词：才走原来的兜底逻辑
-                : (isPlaying ? "♪ ♪" : saying || "暂无歌词，点击换一句")
-            }
+           {displayedText || (isPlaying ? "♪ ♪" : saying || "暂无歌词，点击换一句")}
             <span className="inline-block w-[3px] h-5 bg-indigo-400 align-middle ml-1 shadow-[0_0_8px_rgba(99,102,241,0.8)] animate-cursor" />
           </p>
         </div>
