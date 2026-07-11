@@ -352,7 +352,7 @@ onMounted(() => onSearch());
           <el-input
             v-model="form.key"
             :disabled="isEdit"
-            placeholder="如 cloud_music_playlist_id"
+            placeholder="如 cloudMusicPlaylistId"
           />
         </el-form-item>
 
