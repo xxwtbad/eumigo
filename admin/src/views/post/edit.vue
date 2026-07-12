@@ -337,7 +337,7 @@ onMounted(async () => {
     height: 500,
     upload: {
       url: '/api/upload/image',
-      fieldName: 'file[]'
+      fieldName: 'file'
     }
   }"
 />
