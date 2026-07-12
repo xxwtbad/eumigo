@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { getCurrentUser } from "@/app/lib/auth";
-import { deleteFile, cleanUrlPath, extractR2Urls } from "@/app/lib/r2";
+import { deleteFile, cleanUrlPath, extractR2Urls, getFile, uploadFile, getFileUrl } from "@/app/lib/r2";
 
 function toPostItem(post: any) {
   return {
@@ -194,6 +194,34 @@ export async function PUT(
 
       return updated;
     });
+
+    // ========== 新增：仅文章状态改为 published 发布时，迁移临时图片到正式目录 ==========
+    if (content !== undefined && status === "published") {
+      const usedUrls = extractR2Urls(content);
+      let newContent = content;
+
+      for (const url of usedUrls) {
+        const oldKey = cleanUrlPath(url);
+        if (oldKey.startsWith("temp-blog-images/")) {
+          const newKey = oldKey.replace("temp-blog-images/", "blog-images/");
+          const fileBuf = await getFile(oldKey);
+          if (fileBuf) {
+            await uploadFile(newKey, fileBuf, "");
+            await deleteFile(oldKey).catch(() => {});
+            const newUrl = getFileUrl(newKey);
+            newContent = newContent.replaceAll(url, newUrl);
+          }
+        }
+      }
+
+      if (newContent !== content) {
+        await prisma.post.update({
+          where: { id },
+          data: { content: newContent }
+        });
+      }
+    }
+    // ==========================================================================
 
     // 清理 R2：封面变更时删除旧封面；正文移除的图片也删除
     if (cover !== undefined && cover !== existing.cover && existing.cover) {
