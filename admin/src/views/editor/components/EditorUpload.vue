@@ -21,7 +21,7 @@ const editorConfig = { placeholder: "请输入内容...", MENU_CONF: {} };
 // 更多详细配置看 https://www.wangeditor.com/v5/menu-config.html#%E4%B8%8A%E4%BC%A0%E5%9B%BE%E7%89%87
 editorConfig.MENU_CONF["uploadImage"] = {
   // 服务端上传地址，根据实际业务改写
-  server: "/api/upload/images",
+  server: "/api/upload/image",
   // form-data 的 fieldName，根据实际业务改写
   fieldName: "file",
   // 选择文件时的类型限制，根据实际业务改写
@@ -29,11 +29,8 @@ editorConfig.MENU_CONF["uploadImage"] = {
   // 自定义插入图片
   customInsert(res: any, insertFn) {
     // res.data.url是后端返回的图片地址，根据实际业务改写
-    if (res.data.url) {
-      setTimeout(() => {
-        // insertFn插入图片进编辑器
-        insertFn(res.data.url);
-      }, 2000);
+   if (res.errno === 0 && res.data?.length > 0) {
+      insertFn(res.data[0]);
     }
   }
 };
