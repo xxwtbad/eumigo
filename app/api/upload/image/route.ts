@@ -41,7 +41,8 @@ export async function POST(request: Request) {
 
     const ext = file.type === "image/svg+xml" ? "svg" : file.type.split("/")[1];
     const filename = generateFileName(ext);
-    const key = `uploads/${filename}`;
+    // 修改1：文件夹改为 blog-images
+    const key = `blog-images/${filename}`;
 
     const buffer = await file.arrayBuffer();
 
@@ -51,9 +52,16 @@ export async function POST(request: Request) {
 
     const imageUrl = await uploadFile(key, buffer, file.type);
 
+    // 修改2：返回 Vditor 标准格式，实现自动插入图片
     return NextResponse.json({
-      url: imageUrl,
-      orientation,
+      code: 0,
+      data: {
+        errFiles: [],
+        succMap: {
+          [file.name]: imageUrl
+        }
+      },
+      orientation
     });
   } catch (err: any) {
     if (err.message === "未登录" || err.message === "无效的令牌") {
