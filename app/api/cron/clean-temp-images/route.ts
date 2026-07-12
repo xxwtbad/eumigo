@@ -10,7 +10,7 @@ export async function GET() {
     const client = getS3Client();
     const bucket = getBucketName();
 
-    const expireMs = 1 * 60 * 1000;
+    const expireMs = 7 * 24 * 60 * 60 * 1000;
     const now = Date.now();
 
     const listCmd = new ListObjectsV2Command({
