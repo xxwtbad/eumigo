@@ -322,18 +322,9 @@ onMounted(async () => {
         <el-form-item label="正文">
           <div class="w-full">
         <Vditor
-            v-model="form.content"
-              :options="{
-               height: 500,
-               upload: {
-               url: "/api/upload/image",
-            fieldName: "file",
-            headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-          }
-          }"
-      />
+              v-model="form.content"
+              :options="{ height: 500 }"
+            />
           </div>
         </el-form-item>
       </el-form>
