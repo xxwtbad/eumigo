@@ -41,9 +41,10 @@ export async function POST(request: Request) {
 
     const ext = file.type === "image/svg+xml" ? "svg" : file.type.split("/")[1];
     const filename = generateFileName(ext);
-    // 修改1：文件夹改为 blog-images
-    const key = `blog-images/${filename}`;
-
+    // 原代码：const key = `blog-images/${filename}`;
+  // 修改为临时目录
+  const key = `temp-blog-images/${filename}`;
+    
     const buffer = await file.arrayBuffer();
 
     // 简易方向检测（Cloudflare 不支持 sharp 原生模块）
