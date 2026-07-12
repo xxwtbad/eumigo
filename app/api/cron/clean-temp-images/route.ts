@@ -6,14 +6,13 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    // 所有变量读取、初始化全部放到接口运行时内部，不会在构建阶段执行
     const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME;
     const R2_ENDPOINT = process.env.R2_ENDPOINT;
     const R2_ACCESS_KEY = process.env.R2_ACCESS_KEY_ID;
     const R2_SECRET_KEY = process.env.R2_SECRET_ACCESS_KEY;
 
     if (!R2_BUCKET_NAME || !R2_ENDPOINT || !R2_ACCESS_KEY || !R2_SECRET_KEY) {
-      return NextResponse.json({ success: false, error: "R2环境变量缺失" }, { status: 500 });
+      return NextResponse.json({ success: false, error: "R2环境变量配置不全" }, { status: 500 });
     }
 
     const s3Client = new S3Client({
@@ -52,7 +51,7 @@ export async function GET() {
         await deleteFile(key);
         successCount++;
       } catch (err) {
-        console.error("删除失败：", key, err);
+        console.error("删除文件失败：", key, err);
       }
     }
 
@@ -62,7 +61,7 @@ export async function GET() {
       successDeleted: successCount
     });
   } catch (err) {
-    console.error("定时接口全局错误：", err);
+    console.error("定时清理接口错误：", err);
     return NextResponse.json({ success: false, error: "服务器执行异常" }, { status: 500 });
   }
 }
