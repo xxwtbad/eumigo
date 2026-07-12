@@ -24,7 +24,8 @@ interface SongData {
 }
 
 async function getNeteaseSongs(playlistId: string | null, songIds: string | null): Promise<SongData[]> {
-  const meting = new Meting("netease");
+  // 使用稳定公共跨域 Meting API
+  const meting = new Meting("netease", "https://api.injahow.cn/meting/api");
   meting.format(true);
 
   let tracks: { id: string; name: string; artist: string[]; pic_id: string; url_id: string; lyric_id: string }[] = [];
