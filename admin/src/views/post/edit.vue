@@ -14,6 +14,15 @@ import { getTags } from "@/api/tag";
 import type { CategoryItem } from "@/api/category";
 import type { TagItem } from "@/api/tag";
 import Vditor from "@/views/markdown/components/Vditor.vue";
+  
+import { computed } from "vue";
+// 环境安全版token，打包阶段不会访问localStorage
+const authToken = computed(() => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("token") ?? "";
+  }
+  return "";
+});
 
 defineOptions({ name: "PostEdit" });
 
@@ -321,17 +330,19 @@ onMounted(async () => {
 
         <el-form-item label="正文">
           <div class="w-full">
-        <Vditor
-              v-model="form.content"
-              :options="{ height: 500,
-                          upload: {
-                          url: "/api/upload/image",
-                          fieldName: "file",
-                            headers: {
-                              Authorization: authToken.value ? `Bearer ${authToken.value}` : ''
+       <Vditor
+  v-model="form.content"
+  :options="{
+    height: 500,
+    upload: {
+      url: "/api/upload/image",
+      fieldName: "file",
+      headers: {
+        Authorization: authToken.value ? `Bearer ${authToken.value}` : ""
       }
-    } }"
-            />
+    }
+  }"
+/>
           </div>
         </el-form-item>
       </el-form>
