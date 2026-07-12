@@ -6,7 +6,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-function getS3Client(): S3Client {
+export function getS3Client(): S3Client {
   const accountId = process.env.R2_ACCOUNT_ID;
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
   const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
@@ -25,7 +25,7 @@ function getS3Client(): S3Client {
   });
 }
 
-function getBucketName(): string {
+export function getBucketName(): string {
   return process.env.R2_BUCKET_NAME || "eumigo-files";
 }
 
