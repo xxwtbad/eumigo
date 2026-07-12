@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+// 只改这一行：补 defineOptions，删除下面重复computed
+import { ref, onMounted, computed, defineOptions } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { pinyin } from "pinyin-pro";
 import { message } from "@/utils/message";
@@ -14,15 +15,15 @@ import { getTags } from "@/api/tag";
 import type { CategoryItem } from "@/api/category";
 import type { TagItem } from "@/api/tag";
 import Vditor from "@/views/markdown/components/Vditor.vue";
-  
-import { computed } from "vue";
-// 环境安全版token，打包阶段不会访问localStorage
+
+// ========== 只新增这两行【修复构建报错】 ==========
 const authToken = computed(() => {
   if (typeof window !== "undefined") {
     return localStorage.getItem("token") ?? "";
   }
   return "";
 });
+// ============================================
 
 defineOptions({ name: "PostEdit" });
 
@@ -335,10 +336,10 @@ onMounted(async () => {
   :options="{
     height: 500,
     upload: {
-      url: "/api/upload/image",
-      fieldName: "file",
+      url: '/api/upload/image',
+      fieldName: 'file',
       headers: {
-        Authorization: authToken.value ? `Bearer ${authToken.value}` : ""
+        Authorization: authToken.value ? `Bearer ${authToken.value}` : ''
       }
     }
   }"
