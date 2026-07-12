@@ -336,10 +336,23 @@ onMounted(async () => {
   :options="{
     height: 500,
     upload: {
-      url: '/api/upload/image',
-      fieldName: 'file',
+      url: "/api/upload/image",
+      fieldName: "file[]",
       headers: {
-        Authorization: authToken.value ? `Bearer ${authToken.value}` : ''
+        Authorization: authToken.value ? `Bearer ${authToken.value}` : ""
+      },
+      // 额外传给后端：固定存储文件夹名称
+      extraData: {
+        r2_dir: "blog-images"
+      },
+      // 强制处理返回值，解决图片不插入编辑器
+      success: (editor, resStr) => {
+        const res = JSON.parse(resStr);
+        if (res.code === 0 && res.data?.succMap) {
+          Object.values(res.data.succMap).forEach(imgUrl => {
+            editor.insertValue(`![图片](${imgUrl})`);
+          });
+        }
       }
     }
   }"
