@@ -7,35 +7,45 @@ import {
   getOrgCn,
 } from "@/app/lib/utils";
 
+// 获取北京时间
+function getBeijingTime() {
+  return new Date(Date.now() + 8 * 60 * 60 * 1000);
+}
+
 export async function POST(request: NextRequest) {
   const ip = getClientIp(request);
   const path = request.headers.get("x-path") || "";
   const ua = request.headers.get("user-agent") || "";
 
-  // 去重：同一天同一IP只记录一次
-  const today = new Date();
+  // 基于北京时间计算当天0点和次日0点
+  const nowBeijing = getBeijingTime();
+  const today = new Date(nowBeijing);
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
+
+  // 数据库里面存的依然是UTC格式Date对象，查询条件也要转回UTC时间
+  const utcToday = new Date(today.getTime() - 8 * 60 * 60 * 1000);
+  const utcTomorrow = new Date(tomorrow.getTime() - 8 * 60 * 60 * 1000);
 
   const existing = await prisma.visitor.findFirst({
     where: {
       ip,
       created_at: {
-        gte: today,
-        lt: tomorrow,
+        gte: utcToday,
+        lt: utcTomorrow,
       },
     },
   });
 
   if (existing) {
-    // 已存在今日记录，更新访问路径和时间即可，不创建新记录
+    // 更新访问时间，存入北京时间对应的UTC时间
     const updated = await prisma.visitor.update({
       where: { id: existing.id },
       data: {
         path,
         user_agent: ua,
-        created_at: new Date(), // 刷新为最新访问时间
+        created_at: getBeijingTime(),
       },
     });
     return NextResponse.json({ code: 0, message: "updated", data: updated });
@@ -61,6 +71,8 @@ export async function POST(request: NextRequest) {
       browser: parsed.browser,
       os: parsed.os,
       device_type: parsed.device_type,
+      // 创建访客记录的时间
+      created_at: getBeijingTime(),
     },
   });
 
