@@ -94,12 +94,53 @@ export default function PostDetailPage() {
     return () => { active = false; };
   }, [slug]);
 
-  // 代码高亮
+  // 代码高亮 + 注入复制按钮
   useEffect(() => {
-    if (!post) return;
+    if (!post || !contentRef.current) return;
     requestAnimationFrame(() => {
+      // 执行代码高亮
       document.querySelectorAll<HTMLElement>(".post-content pre code[class*=language-]").forEach((el) => {
         hljs.highlightElement(el);
+      });
+
+      // 添加复制按钮
+      const preList = contentRef.current!.querySelectorAll<HTMLPreElement>(".post-content pre");
+      preList.forEach((pre) => {
+        if (pre.querySelector(".code-copy-btn")) return;
+        pre.style.position = "relative";
+
+        const copyBtn = document.createElement("button");
+        copyBtn.className = "code-copy-btn";
+        copyBtn.innerText = "复制";
+        copyBtn.style.cssText = `
+          position:absolute;
+          top:10px;
+          right:10px;
+          background:#475569;
+          color:#fff;
+          font-size:13px;
+          border:none;
+          padding:4px 10px;
+          border-radius:6px;
+          cursor:pointer;
+          z-index:10;
+          transition:0.2s;
+        `;
+        copyBtn.onmouseover = () => {
+          copyBtn.style.background = "#6366f1";
+        };
+        copyBtn.onmouseout = () => {
+          copyBtn.style.background = "#475569";
+        };
+        copyBtn.onclick = async () => {
+          const codeText = pre.querySelector("code")?.innerText ?? "";
+          await navigator.clipboard.writeText(codeText);
+          copyBtn.innerText = "已复制!";
+          setTimeout(() => {
+            copyBtn.innerText = "复制";
+          }, 1500);
+        };
+        pre.appendChild(copyBtn);
       });
     });
   }, [post]);
